@@ -1,0 +1,72 @@
+% Aircraft Descent Simulation with Speed Constraints
+clear; clc; close all;
+
+%% 1. Parameters & Constraints
+initial_alt = 35000;      % ft (Cruising altitude)
+target_alt = 0;           % ft (Landing)
+dt = 1;                   % seconds (Time step)
+
+% Constraints
+max_v_speed = -3000 / 60; % ft/s (Max descent rate: 3000 fpm)
+min_v_speed = -500 / 60;  % ft/s (Min descent rate: 500 fpm)
+target_v_speed = -2000 / 60; % ft/s (Standard descent rate)
+
+%% 2. Initialization
+time = 0;
+alt = initial_alt;
+alt_history = initial_alt;
+speed_history = 0;
+time_history = 0;
+
+%% 3. Simulation Loop
+while alt > target_alt
+    time = time + dt;
+    
+    % Logic for Descent Phases
+    if alt > 10000
+        % Phase 1: Steady Descent (High altitude)
+        v_z = target_v_speed; 
+    elseif alt <= 10000 && alt > 3000
+        % Phase 2: Leveling/Deceleration (Intermediate)
+        % Slightly slower descent to comply with speed limits
+        v_z = max(target_v_speed * 0.6, max_v_speed);
+    else
+        % Phase 3: Final Approach (Low altitude)
+        % Gradually reducing vertical speed for touchdown
+        v_z = min_v_speed; 
+    end
+    
+    % Enforce Hard Constraints (Safety Envelope)
+    v_z = max(min(v_z, min_v_speed), max_v_speed);
+    
+    % Update Altitude
+    alt = alt + (v_z * dt);
+    
+    % Ensure we don't go below ground
+    if alt < 0, alt = 0; end
+    
+    % Store Data
+    time_history(end+1) = time;
+    alt_history(end+1) = alt;
+    speed_history(end+1) = abs(v_z * 60); % Store as positive fpm
+end
+
+%% 4. Visualization
+figure('Color', 'w', 'Position', [100, 100, 800, 600]);
+
+% Altitude vs Time
+subplot(2,1,1);
+plot(time_history/60, alt_history, 'b', 'LineWidth', 2);
+grid on;
+title('Altitude Profile During Descent');
+ylabel('Altitude (ft)');
+xlabel('Time (minutes)');
+
+% Vertical Speed vs Time
+subplot(2,1,2);
+plot(time_history/60, speed_history, 'r', 'LineWidth', 2);
+grid on;
+title('Vertical Speed Profile');
+ylabel('Vertical Speed (ft/min)');
+xlabel('Time (minutes)');
+ylim([0, abs(max_v_speed*60) + 500]);
