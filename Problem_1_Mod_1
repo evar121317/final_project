@@ -1,0 +1,50 @@
+% Define usage vector
+x = (0:25:800)';
+
+% Plan A: linear billing
+BA = 15 * x + 25;
+
+% Plan B: piecewise billing
+BB = zeros(size(x));
+for i = 1:length(x)
+    if x(i) <= 400
+        BB(i) = 12 * x(i) + 40;
+    else
+        BB(i) = 14 * x(i) + (40 - 2 * 400);
+    end
+end
+
+figure;
+plot(x, BA, '-o', 'LineWidth', 2, 'DisplayName', 'Plan A');
+hold on;
+plot(x, BB, '-s', 'LineWidth', 2, 'DisplayName', 'Plan B');
+
+% Mark break at 400 kWh
+plot([400 400], ylim, 'k--', 'LineWidth', 1.5, 'DisplayName', 'Break at 400 kWh');
+
+xlabel('Energy Usage (kWh)');
+ylabel('Monthly Bill ($)');
+title('Community Solar Billing Plans');
+legend('Location', 'northwest');
+grid on;
+hold off;
+
+% Select 10 usage points evenly spaced
+usage_points = linspace(0, 800, 10)';
+
+% Calculate bills for these points
+BA_points = 15 * usage_points + 25;
+BB_points = zeros(size(usage_points));
+for i = 1:length(usage_points)
+    if usage_points(i) <= 400
+        BB_points(i) = 12 * usage_points(i) + 40;
+    else
+        BB_points(i) = 14 * usage_points(i) + (40 - 2 * 400);
+    end
+end
+
+% Create table
+billing_table = table(usage_points, BA_points, BB_points, ...
+    'VariableNames', {'Usage_kWh', 'PlanA_Bill', 'PlanB_Bill'});
+
+disp(billing_table);
