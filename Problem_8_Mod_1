@@ -1,0 +1,42 @@
+% Parameters
+v = 30; % average speed in mph
+b = 10; % handling time in minutes
+m = 60 / v; % minutes per mile
+
+% Distance vector
+d = 0:1:40;
+
+% Calculate delivery time
+T = m * d + b;
+
+% Interpretation based on time
+interpretation = cell(size(T));
+for i = 1:length(T)
+    if T(i) <= 30
+        interpretation{i} = 'short';
+    elseif T(i) <= 60
+        interpretation{i} = 'medium';
+    else
+        interpretation{i} = 'long';
+    end
+end
+
+% Create table
+deliveryTable = table(d', T', interpretation', ...
+    'VariableNames', {'Distance_miles', 'Time_minutes', 'Interpretation'});
+
+% Display first 10 rows as example
+disp(deliveryTable(1:10,:));
+
+% Plot time vs distance
+figure;
+plot(d, T, 'b-', 'LineWidth', 2);
+xlabel('Distance (miles)');
+ylabel('Delivery Time (minutes)');
+title('Delivery Time vs Distance');
+grid on;
+
+% Interpretation of slope and intercept
+fprintf('Slope (m): %.2f min/mile - time added per mile traveled.\n', m);
+fprintf('Intercept (b): %.2f min - fixed handling time independent of distance.\n', b);
+
