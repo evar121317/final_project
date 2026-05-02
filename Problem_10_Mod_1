@@ -1,0 +1,37 @@
+% Define usage range (0 to 1000 kWh)
+x = linspace(0, 1000, 1000);
+
+% Model A: Linear cost C = 0.12 * x
+a = 0.12;
+C_A = a * x;
+
+% Model B: Quadratic cost C = 0.10*x + 0.00005*x^2
+b = 0.10;
+c = 0.00005;
+C_B = b * x + c * x.^2;
+
+% Model C: Piecewise linear cost
+% 0-500 kWh at $0.10/kWh, above 500 kWh at $0.15/kWh
+C_C = zeros(size(x));
+for i = 1:length(x)
+    if x(i) <= 500
+        C_C(i) = 0.10 * x(i);
+    else
+        C_C(i) = 0.10 * 500 + 0.15 * (x(i) - 500);
+    end
+end
+
+% Plot all models
+figure;
+plot(x, C_A, 'b-', 'LineWidth', 2); hold on;
+plot(x, C_B, 'r--', 'LineWidth', 2);
+plot(x, C_C, 'g-.', 'LineWidth', 2);
+hold off;
+
+% Labels and legend
+xlabel('Electricity Usage (kWh)');
+ylabel('Cost (USD)');
+title('Electricity Cost Models: Linear, Quadratic, Piecewise Linear');
+legend({'Model A: Linear', 'Model B: Quadratic', 'Model C: Piecewise Linear'}, 'Location', 'northwest');
+grid on;
+
