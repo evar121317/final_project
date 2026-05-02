@@ -1,0 +1,38 @@
+% Cooling Simulation using Newton's Law of Cooling
+clear; clc; close all;
+
+%% 1. Parameters
+t_final = 100;              % Total time (minutes)
+dt = 0.1;                   % Time step
+time = 0:dt:t_final;        % Time vector
+
+T_initial = 100;            % Initial temperature (deg C)
+T_env = 25;                 % Ambient temperature (deg C)
+
+% Different cooling coefficients to compare
+% (Higher k = faster cooling, e.g., metal vs. plastic)
+k_values = [0.05, 0.1, 0.2]; 
+labels = {'Slow Cooling (k=0.05)', 'Medium Cooling (k=0.1)', 'Fast Cooling (k=0.2)'};
+colors = ['b', 'g', 'r'];
+
+%% 2. Simulation and Plotting
+figure('Color', 'w');
+hold on;
+
+for i = 1:length(k_values)
+    k = k_values(i);
+    
+    % Analytical solution: T(t) = T_env + (T_initial - T_env) * exp(-k*t)
+    T = T_env + (T_initial - T_env) * exp(-k * time);
+    
+    plot(time, T, 'Color', colors(i), 'LineWidth', 2, 'DisplayName', labels{i});
+end
+
+%% 3. Formatting
+yline(T_env, '--k', 'Ambient Temperature', 'LabelVerticalAlignment', 'bottom');
+grid on;
+xlabel('Time (minutes)');
+ylabel('Temperature (°C)');
+title('Temperature Decay Over Time (Newton''s Law of Cooling)');
+legend('Location', 'northeast');
+axis([0 t_final T_env-5 T_initial+5]);
