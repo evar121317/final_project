@@ -1,0 +1,43 @@
+% Time vector
+t = 0:1:25;
+
+% Initialize volume vector
+V = zeros(size(t));
+
+% Logical indexing for phases
+filling_idx = (t >= 0) & (t <= 10);
+draining_idx = (t > 10) & (t <= 25);
+
+% Piecewise volume assignment
+V(filling_idx) = 5 * t(filling_idx) + 20;
+V(draining_idx) = -3 * (t(draining_idx) - 10) + 70;
+
+% Plot V(t)
+figure;
+plot(t, V, 'b-o', 'LineWidth', 2, 'MarkerSize', 6);
+xlabel('Time (minutes)');
+ylabel('Volume V(t) (liters)');
+title('Water Tank Volume vs Time');
+grid on;
+
+% Find when V = 50 liters
+% Using interpolation for more precise time if needed
+times_50 = interp1(V, t, 50, 'linear');
+
+if isempty(times_50) || any(isnan(times_50))
+    fprintf('Tank volume does not reach 50 liters within the time range.\n');
+else
+    fprintf('Tank volume reaches 50 liters at time(s): %.2f minutes\n', times_50);
+end
+
+% Create table with at least 12 rows (every other minute)
+t_table = t(1:2:end)';
+V_table = V(1:2:end)';
+volumeTable = table(t_table, V_table, 'VariableNames', {'Time_min', 'Volume_liters'});
+
+disp(volumeTable);
+
+% Interpretation of slopes
+fprintf('\nInterpretation of slopes:\n');
+fprintf('Filling phase slope: +5 liters/min indicates the tank is filling at a constant rate.\n');
+fprintf('Draining phase slope: -3 liters/min indicates the tank is draining at a slower constant rate.\n');
