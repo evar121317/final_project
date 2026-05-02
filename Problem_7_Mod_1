@@ -1,0 +1,55 @@
+% Define x range
+x = -20:0.5:20;
+
+% Parameters for streetlight 1
+h1 = -5;
+Bmax1 = 100;
+k1 = 1.5;
+
+% Parameters for streetlight 2
+h2 = 8;
+Bmax2 = 80;
+k2 = 1.0;
+
+% Brightness models
+B1 = -k1 * (x - h1).^2 + Bmax1;
+B2 = -k2 * (x - h2).^2 + Bmax2;
+
+% Plot brightness curves
+figure;
+plot(x, B1, 'b-', 'LineWidth', 2); hold on;
+plot(x, B2, 'r--', 'LineWidth', 2);
+xlabel('Position along the road (meters)');
+ylabel('Brightness');
+title('Brightness Models for Two Streetlights');
+legend({'Streetlight 1', 'Streetlight 2'}, 'Location', 'northeast');
+grid on;
+
+% Max brightness locations and values
+fprintf('Streetlight 1 max brightness: %.1f at x = %.1f\n', Bmax1, h1);
+fprintf('Streetlight 2 max brightness: %.1f at x = %.1f\n', Bmax2, h2);
+
+% Find intersection points numerically
+diff_B = B1 - B2;
+% Locate sign changes in diff_B to find intervals of intersection
+sign_changes = find(diff(diff_B > 0));
+
+intersection_points = [];
+for i = 1:length(sign_changes)
+    idx = sign_changes(i);
+    % Linear interpolation to estimate intersection x
+    x1 = x(idx);
+    x2 = x(idx + 1);
+    y1 = diff_B(idx);
+    y2 = diff_B(idx + 1);
+    % Linear interpolation formula
+    x_intersect = x1 - y1 * (x2 - x1) / (y2 - y1);
+    intersection_points(end+1) = x_intersect;
+end
+
+fprintf('Approximate intersection points at x = ');
+fprintf('%.2f ', intersection_points);
+fprintf('\n');
+
+hold on;
+plot(intersection_points, -k1 * (intersection_points - h1).^2 + Bmax1, 'ko', 'MarkerSize', 8, 'MarkerFaceColor', 'k');
