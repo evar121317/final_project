@@ -1,0 +1,42 @@
+% Time vector
+t = 0:0.2:20;
+
+% Speed profile
+v = -0.2 * (t - 10).^2 + 20;
+
+% Plot speed vs time
+figure;
+plot(t, v, 'b-', 'LineWidth', 2);
+xlabel('Time (s)');
+ylabel('Speed (units/s)');
+title('Speed vs Time');
+grid on;
+
+% Numerical estimate of acceleration (finite differences)
+dt = t(2) - t(1);
+a = diff(v) / dt;
+
+% To plot acceleration vs time, use midpoints of t
+t_acc = t(1:end-1) + dt/2;
+
+figure;
+plot(t_acc, a, 'r-', 'LineWidth', 2);
+xlabel('Time (s)');
+ylabel('Acceleration (units/s^2)');
+title('Acceleration vs Time');
+grid on;
+
+% Identify time of max speed
+[max_speed, idx_max] = max(v);
+t_max_speed = t(idx_max);
+fprintf('Maximum speed of %.2f units/s occurs at t = %.2f seconds.\n', max_speed, t_max_speed);
+
+% Acceleration near max speed (closest acceleration point)
+if idx_max == 1
+    acc_near_max = a(1);
+elseif idx_max == length(t)
+    acc_near_max = a(end);
+else
+    acc_near_max = (a(idx_max-1) + a(idx_max)) / 2;
+end
+fprintf('Acceleration near max speed is approximately %.2f units/s^2.\n', acc_near_max);
