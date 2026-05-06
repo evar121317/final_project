@@ -1,0 +1,76 @@
+% Parameters
+m = 1500; % kg
+F = 5000; % N (constant braking force)
+dt = 0.01; % time step (s)
+initial_velocities = [10, 20, 30]; % m/s
+
+% Preallocate results
+stopping_distances = zeros(size(initial_velocities));
+stopping_times = zeros(size(initial_velocities));
+
+% Simulate for each initial velocity
+for i = 1:length(initial_velocities)
+    v0 = initial_velocities(i);
+    v = v0;
+    x = 0;
+    t = 0;
+
+    % Time-stepped simulation
+    while v > 0
+        % Update velocity and position
+        a = -F / m; % deceleration
+        v = v + a * dt;
+        x = x + v * dt;
+        t = t + dt;
+
+        % Clamp velocity to zero to avoid negative values
+        if v < 0
+            v = 0;
+        end
+    end
+
+    % Store results
+    stopping_distances(i) = x;
+    stopping_times(i) = t;
+end
+
+% Plot stopping distance vs initial velocity
+figure;
+plot(initial_velocities, stopping_distances, 'bo-', 'LineWidth', 2, 'MarkerSize', 8);
+xlabel('Initial Velocity (m/s)');
+ylabel('Stopping Distance (m)');
+title('Stopping Distance vs Initial Velocity');
+grid on;
+
+% Plot velocity vs time for each initial velocity
+figure;
+hold on;
+for i = 1:length(initial_velocities)
+    v0 = initial_velocities(i);
+    v = v0;
+    t = 0:dt:stopping_times(i);
+    velocity_profile = zeros(size(t));
+
+    for j = 1:length(t)
+        if t(j) * (F/m) < v0
+            velocity_profile(j) = v0 - (F/m) * t(j);
+        else
+            velocity_profile(j) = 0;
+        end
+    end
+
+    plot(t, velocity_profile, 'LineWidth', 2);
+end
+xlabel('Time (s)');
+ylabel('Velocity (m/s)');
+title('Velocity vs Time for Different Initial Velocities');
+legend(arrayfun(@(x) sprintf('v₀ = %d m/s', x), initial_velocities, 'UniformOutput', false));
+grid on;
+hold off;
+
+% Display results
+disp('Stopping Distance Results:');
+for i = 1:length(initial_velocities)
+    fprintf('Initial Velocity: %d m/s | Stopping Distance: %.2f m | Stopping Time: %.2f s\n', ...
+            initial_velocities(i), stopping_distances(i), stopping_times(i));
+end
